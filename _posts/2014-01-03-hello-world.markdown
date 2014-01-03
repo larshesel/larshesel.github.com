@@ -2,7 +2,6 @@
 layout: post
 title:  "Hello World"
 date:   2014-01-03 08:56:55
-categories: jekyll update
 ---
 
 I finally pulled myself together and got a basic github-pages blog up
