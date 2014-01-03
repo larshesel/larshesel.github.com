@@ -44,7 +44,7 @@ a:visited { color: #a0a; }
 }
 
 .posts span {
-  color: #aaa;
+  color: #888;
   font-family: Monaco, "Courier New", monospace;
   font-size: 80%;
 }
@@ -82,7 +82,7 @@ a:visited { color: #a0a; }
 }
 
 .header a.extra {
-  color: #aaa;
+  color: #888;
   margin-left: 1em;
 }
 
@@ -91,7 +91,7 @@ a:visited { color: #a0a; }
 }
 
 .meta {
-  color: #aaa;
+  color: #888;
 }
 
 .footer {
