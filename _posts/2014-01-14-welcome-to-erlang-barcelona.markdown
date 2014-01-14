@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  To everyone interested in Erlang in Barcelona!"
+title:  "To everyone interested in Erlang in Barcelona!"
 ---
 
 As of now there is a new meetup in Barcelona:
