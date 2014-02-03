@@ -16,6 +16,9 @@ tempo on EmacsWiki, but frankly, the examples I tested there just
 didn't work. I don't know if the documentation hasn't been properly
 updated. I am using Emacs 24.3.1.
 
+Before doing anything else, don't forget to load the tempo package:
+`(require 'tempo)`.
+
 From the EmacsWiki and the Emacs modes I quicky learned that the
 important function for defining a template was the
 `tempo-define-template` function, which has a compact but good
