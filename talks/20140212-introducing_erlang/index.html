@@ -1,0 +1,588 @@
+<!--
+slidedeck: A modification of the Google IO 2012 HTML5 slide template
+URL: https://github.com/rmcgibbo/slidedeck
+
+Based on https://github.com/francescolaffi/elastic-google-io-slides, and
+ultimately:
+
+Google IO 2012 HTML5 Slide Template
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahe <lukem@google.com>
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Introducing Erlang</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+   <link rel="shortcut icon" href=" /favicon.ico"/> 
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="all" href="theme/css/custom.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+
+  <!-- MathJax support  -->
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    showProcessingMessages: false,
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+<slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+
+    <h1> Introducing Erlang</h1>
+    <h2> - What the fuzz is all about</h2>
+    <p> Lars Hesel Christensen<br/> @larshesel on Twitter</p>
+  </hgroup>
+</slide>
+
+
+<slide  >
+  
+    <hgroup>
+      <h2>This talk</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>Yours truly</li>
+<li>Why Erlang?</li>
+<li>Erlang philosophy</li>
+<li>A quick tour</li>
+<li>Fault tolerance</li>
+<li>OTP</li>
+<li>The community</li>
+<li>Maybe have a look at maps in R17-rc1</li>
+<li>Outro</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>A bit about me</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>From Denmark</li>
+<li>Lived in Switzerland 2008-2013</li>
+<li>In Barcelona since October</li>
+</ul>
+<p><br /></p>
+<ul>
+<li>Embedded devices (c, c++) for telecom and industry</li>
+<li>Desktop applications (.Net) for reinsurance</li>
+<li>Android apps (Java) for banks and industry</li>
+<li>Server side (Erlang) for retail</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Why Erlang?</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>Ericsson had (among others) the following requirements:</p>
+<ul>
+<li>Thousands of concurrent tasks</li>
+<li>Fault tolerance</li>
+<li>Continuous operation</li>
+<li>Soft real time</li>
+<li>Distribution</li>
+<li>Very large systems (millions of SLOC)</li>
+</ul>
+<!-- Mid '80s
+    Ericsson trying to make better products
+    Joe Armstrong, Mike Williams, Robert Virding
+    task: "do something about how we write software"
+    --></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Erlang pocket philosophy</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>The world is parallel</li>
+<li>Isolation</li>
+<li>Recoverability</li>
+<li>Let it crash (defer error handling)</li>
+<li>...</li>
+</ul>
+<p>Were the first that came to mind...</p>
+<!-- that the world is concurrent - this had a huge impact on the language design
+     when implementing real world domains (as telephony systems)
+     we need concurrency.
+     It's how our brain works.
+     We do not share memory - we send messages. -->
+
+<!-- Implications: -->
+
+<!-- - Don't code defensively (except at data entry points) --></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Erlang the language</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>Impure functional language</li>
+<li>Single assignment, immutable</li>
+<li>Strict evaluation</li>
+<li>Dynamic (with type annotations &amp; Dialyzer)</li>
+<li><b>Actors</b></li>
+<li><b>Message passing</b></li>
+</ul>
+<p><br /></p>
+<ul>
+<li>No classes or inheritance!</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Functions</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="erlang">
+-module(fibonacci).
+-export([fibonacci/1]).
+
+fibonacci(1) -> 1;
+fibonacci(2) -> 1;
+fibonacci(N) -> fibonacci(N-1) + fibonacci(N-2).
+</pre>
+
+<pre class="prettyprint" data-lang="erlang">
+> fibonacci:fibonacci(1).
+1
+> fibonacci:fibonacci(3).
+2
+> fibonacci:fibonacci(10).
+55
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Case</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="erlang">
+-module(using_case).
+-export([fibonacci/1]).
+
+fibonacci(N) ->
+    case N of
+        1 -> 1;
+        2 -> 1;
+        _ -> fibonacci(N-1) + fibonacci(N-2)
+    end.
+</pre>
+
+<pre class="prettyprint" data-lang="erlang">
+> using_case:fibonacci(1).
+1
+> using_case:fibonacci(3).
+2
+> using_case:fibonacci(10).
+55
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Pattern matching</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="erlang">
+> {_, Second, Third, _, _} = {a, tuple, with, five, entries}.
+{a,tuple,with,five,entries}
+> Second.
+tuple
+> Third.
+with
+</pre>
+
+<ul>
+<li>evaluating a function call</li>
+<li>case statements</li>
+<li>receive statements</li>
+<li>try statements</li>
+<li>and using <code>=</code> as above</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Pattern matching</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>Consider the function:</p>
+<pre class="prettyprint" data-lang="erlang">
+pattern_match({_, Second, Third, _, _}) ->
+    [Second, Third].
+</pre>
+
+<pre class="prettyprint" data-lang="erlang">
+> pattern_match({a, tuple, with, five, entries}).
+[tuple,with]
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Canonical pattern matching example</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="erlang">
+-define(IP_VERSION, 4).
+-define(IP_MIN_HDR_LEN, 5).
+
+DgramSize = byte_size(Dgram),
+case Dgram of
+    &lt;&lt;?IP_VERSION:4, HLen:4, SrvcType:8, TotLen:16,
+      ID:16, Flgs:3, FragOff:13,
+      TTL:8, Proto:8, HdrChkSum:16,
+      SrcIP:32,
+      DestIP:32, RestDgram/binary&gt;&gt; when HLen &gt;= 5, 4*HLen =&lt; DgramSize ->
+        OptsLen = 4*(HLen - ?IP_MIN_HDR_LEN),
+        &lt;&lt;Opts:OptsLen/binary,Data/binary&gt;&gt; = RestDgram,
+    ...
+end.
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Messages</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="erlang">
+spawn_a_fun() ->
+    Pid = spawn(fun rec_fun/0),
+    Pid ! {packet, "Hello!"},
+    ok.
+
+rec_fun() ->
+    receive
+        {packet, Msg} ->
+            io:format("Got msg: ~p~n", [Msg])
+    end.
+</pre>
+
+<pre class="prettyprint" data-lang="erlang">
+> spawn_a_fun().
+Got msg: "Hello!"
+ok
+</pre></article>
+ 
+</slide>
+
+<slide class="img-top-center" >
+  
+    <hgroup>
+      <h2>Fault tolerance, supervisors</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><img height=400 src=figures/supervisor.png style /></p></article>
+ 
+</slide>
+
+<slide class="img-top-center" >
+  
+    <hgroup>
+      <h2>Supervising supervisors</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><img height=400 src=figures/supervision_tree.png style /></p></article>
+ 
+</slide>
+
+<slide class="img-top-center" >
+  
+    <hgroup>
+      <h2>Fault tolerance</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><img height=400 src=figures/shared_mem_ok.png style /></p></article>
+ 
+</slide>
+
+<slide class="img-top-center" >
+  
+    <hgroup>
+      <h2>Fault tolerance</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><img height=400 src=figures/shared_memory_crash.png style /></p></article>
+ 
+</slide>
+
+<slide class="img-top-center" >
+  
+    <hgroup>
+      <h2>Fault tolerance</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><img height=400 src=figures/shared_memory_whatnow.png style /></p>
+<p>The remaining process cannot meaningfully continue!</p>
+<!-- since the crashed process couldn't anticipate the crash,
+    how can you expect the other process to be able to understand
+    the corrupt or undefined state and continue? --></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Actors & message passing!</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>Actors are</p>
+<p><img height=300 src=figures/message_passing.png style="position: absolute; top: 15%; right: 10%;" /></p>
+<ul>
+<li>Process</li>
+<li>State and msgbox</li>
+</ul>
+<p>Actors encapsulate</p>
+<ul>
+<li>Actors can only change their own state</li>
+<li>Change state of others indirectly, through message passing</li>
+</ul>
+<!-- you can't have fault tolerance of concurrent activities
+    in a shared memory model! -->
+
+<!-- OR, you can't convince anyone that you have it. You can with actors and message passing! --></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Erlang VM</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>Implements processes independently of OS</li>
+<li>Supports massive concurrency</li>
+<li>Fast process creation. I once measured $~7\mu s$/process when creating 1M processes</li>
+<li>Fast context switching</li>
+<li>Rock solid</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Let it crash philosophy</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>Exception: The run-time system does not know what to do</li>
+<li>Error: The programmer does not know what to do</li>
+</ul>
+<p>Let's look at an error example (from <a
+href="http://www.erlang.org/download/armstrong_thesis_2003.pdf">Joe's
+Ph.D thesis</a>).</p>
+<p><br />
+Assume spec says we handle two op-codes:</p>
+<pre class="prettyprint" data-lang="erlang">
+asm(load) -> 1;
+asm(store) -> 2.
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Let it crash (cont.)</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>What should happen if we eval <code>asm(jump)</code>?</p>
+<pre class="prettyprint" data-lang="erlang">
+asm(load) -> 1;
+asm(store) -> 2;
+asm(X) -> ????????????
+</pre>
+
+<p>We could try:</p>
+<pre class="prettyprint" data-lang="erlang">
+asm(load) -> 1;
+asm(store) -> 2;
+asm(X) -> exit({oops,i,did,it,again,in,asm,X})
+</pre>
+
+<p>But this isn't really an improvement!</p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Let it crash (cont.)</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>So don't! Just let it crash and let the supervisor take care of it.</p>
+<pre class="prettyprint" data-lang="erlang">
+asm(load) -> 1;
+asm(store) -> 2;
+</pre>
+
+<p>This is much easier to understand. No clutter!</p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>OTP middleware</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>a standard library</li>
+<li>servers (gen_server)</li>
+<li>finite state machines (gen_fsm)</li>
+<li>event handling (gen_event)</li>
+<li>testing, tracing, monitoring</li>
+<li>and much, much more...</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>R17 maps</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>... Let's all go to the terminal</p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The community</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>mailing lists (questions, patches, bugs)</li>
+<li>IRC</li>
+<li>conferences (EUC, EFs, Code Mesh, ...)</li>
+<li>meetups like this</li>
+<li>...</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>References:</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li><a href="http://www.erlang.org">Erlang Programming Language - erlang.org</a></li>
+<li><a href="http://www.erlang.org/download/armstrong_thesis_2003.pdf">Joe Armstrong's Ph.d Thesis</a></li>
+<li><a href="http://erlang.org/pipermail/erlang-questions/">Erlang Questions Mailing List</a></li>
+<li><a href="http://learnyousomeerlang.com/">Learn You Some Erlang</a></li>
+<li><a href="http://dl.acm.org/citation.cfm?doid=1810891.1810910">Erlang, Joe Armstrong</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Erlang humor / outro</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>
+<p>The hipster version: <a href="http://www.youtube.com/watch?v=rRbY3TMUcgQ">Erlang the Movie II</a></p>
+</li>
+<li>
+<p>The originial: <a href="http://www.youtube.com/watch?v=xrIjfIjssLE">Erlang the Movie</a></p>
+</li>
+</ul></article>
+ 
+</slide>
+
+
+<slide class="thank-you-slide segue nobackground">
+  <!-- <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside> -->
+  <article class="flexbox vleft auto-fadein">
+    <h2> Thank you!</h2>
+    <p> Thanks to <a href="http://redbooth.com">Redbooth.com</a> for hosting!</p>
+  </article>
+  <p data-config-contact class="auto-fadein"> <a href="http://larshesel.dk">larshesel.dk</a><br/> <a href="http://github.com/larshesel">github.com/larshesel</a><br/> <a href="http://twitter.com/larshesel">@larshesel on Twitter</a></p>
+  </p>
+</slide>
+
+<slide class="backdrop"></slide>
+
+</slides>
+
+<!-- <script> -->
+<!-- var _gaq = _gaq || []; -->
+<!-- _gaq.push(['_setAccount', 'UA-XXXXXXXX-1']); -->
+<!-- _gaq.push(['_trackPageview']); -->
+
+<!-- (function() { -->
+<!--   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; -->
+<!--   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; -->
+<!--   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); -->
+<!-- })(); -->
+<!-- </script> -->
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
